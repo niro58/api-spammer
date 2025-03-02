@@ -20,11 +20,13 @@ func main() {
 	jobs := make(chan Destination, config.TotalRequests)
 	results := make(chan FetchResult, config.TotalRequests)
 
-	for w := 1; w <= config.Clients; w++ {
+	for w := 0; w < config.Clients; w++ {
 		go worker(jobs, results)
 	}
-	for j := 1; j <= config.TotalRequests; j++ {
-		ep := config.Endpoints[0]
+	for j := 0; j < config.TotalRequests; j++ {
+
+		ep := config.Endpoints[j%len(config.Endpoints)]
+
 		job := Destination{
 			Id:     j,
 			Url:    ep.Url,
@@ -36,7 +38,7 @@ func main() {
 	}
 	close(jobs)
 
-	for a := 1; a <= config.TotalRequests; a++ {
+	for a := 0; a < config.TotalRequests; a++ {
 		res := <-results
 		statistics.AddRequest(res)
 	}
