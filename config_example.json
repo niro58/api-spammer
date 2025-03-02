@@ -1,0 +1,22 @@
+{
+  "endpoints": [
+    {
+      "url": "https://httpbin.org/get",
+      "method": "GET",
+      "data": {
+        "test": "asd",
+        "lol": "bruh"
+      }
+    },
+    {
+      "url": "https://httpbin.org/post",
+      "method": "POST",
+      "data": {
+        "test": "asd",
+        "lol": "bruh"
+      }
+    }
+  ],
+  "clients": 20,
+  "total_requests": 500
+}
