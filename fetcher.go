@@ -45,16 +45,17 @@ func CreatePostReq(ctx context.Context, d *Destination) *http.Request {
 	if err != nil {
 		panic(err)
 	}
-	reqBody := bytes.NewBuffer([]byte(reqBytes))
+	reqBody := bytes.NewBuffer(reqBytes)
 
 	req, err := http.NewRequestWithContext(ctx, d.Method, d.Url, reqBody)
 	if err != nil {
 		panic(err)
-
 	}
+
+	req.Header.Set("Content-Type", "application/json")
+
 	return req
 }
-
 func (d *Destination) Fetch() FetchResult {
 	timeStart := time.Now()
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)

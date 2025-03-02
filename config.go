@@ -21,7 +21,7 @@ type Config struct {
 func LoadConfig() Config {
 	file, err := os.Open("./config.json")
 	if err != nil {
-		Logger.Print("error", "Failed to open config file")
+		Logger.Log(Logger.ColorError, "Failed to open config file")
 		os.Exit(1)
 	}
 	defer file.Close()
@@ -31,7 +31,7 @@ func LoadConfig() Config {
 	err = decoder.Decode(&config)
 
 	if err != nil {
-		Logger.Print("error", "Failed to parse config file", err)
+		Logger.Log(Logger.ColorError, "Failed to parse config file", err)
 		os.Exit(1)
 	}
 

@@ -1,7 +1,7 @@
 package main
 
 import (
-	Logger "api-spammer/logger"
+	logger "api-spammer/logger"
 	"fmt"
 )
 
@@ -16,7 +16,7 @@ type Statistics struct {
 }
 
 func (s *Statistics) AddRequest(result FetchResult) {
-	Logger.WriteLog(result)
+	logger.WriteLog(result)
 
 	s.TotalRequests++
 	s.TotalTime += result.ReplyTime
@@ -39,11 +39,11 @@ func (s *Statistics) AddRequest(result FetchResult) {
 }
 
 func (s *Statistics) Debug() {
-	Logger.Print("info", "Total requests: ", s.TotalRequests)
-	Logger.Print("info", "Successful requests: ", s.SuccessfulRequests)
-	Logger.Print("info", "Failed requests: ", s.FailedRequests)
-	Logger.Print("info", fmt.Sprintf("Total time: %d ms", s.TotalTime))
-	Logger.Print("info", fmt.Sprintf("Min time: %d ms", s.MinTime))
-	Logger.Print("info", fmt.Sprintf("Max time: %d ms", s.MaxTime))
-	Logger.Print("info", fmt.Sprintf("Average time: %d ms", s.AverageTime))
+	logger.Log(logger.ColorSuccess, "Total requests: ", s.TotalRequests)
+	logger.Log(logger.ColorSuccess, "Successful requests: ", s.SuccessfulRequests)
+	logger.Log(logger.ColorError, "Failed requests: ", s.FailedRequests)
+	logger.Log(logger.ColorDefault, fmt.Sprintf("Total time: %d ms", s.TotalTime))
+	logger.Log(logger.ColorDefault, fmt.Sprintf("Min time: %d ms", s.MinTime))
+	logger.Log(logger.ColorError, fmt.Sprintf("Max time: %d ms", s.MaxTime))
+	logger.Log(logger.ColorDefault, fmt.Sprintf("Average time: %d ms", s.AverageTime))
 }
