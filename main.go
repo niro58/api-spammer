@@ -1,24 +1,26 @@
 package main
 
 import (
-	Logger "api-spammer/logger"
+	cfg "api-spammer/internal/config"
+	"api-spammer/internal/fetcher"
+	"api-spammer/internal/logger"
 )
 
-var config Config
-var statistics Statistics
+var config cfg.Config
+var statistics fetcher.Statistics
 
-func worker(jobs <-chan Destination, results chan<- FetchResult) {
+func worker(jobs <-chan fetcher.Destination, results chan<- fetcher.FetchResult) {
 	for j := range jobs {
 		results <- j.Fetch()
 	}
 }
 
 func main() {
-	config = LoadConfig()
-	Logger.Init()
+	config = cfg.LoadConfig()
+	logger.Init()
 
-	jobs := make(chan Destination, config.TotalRequests)
-	results := make(chan FetchResult, config.TotalRequests)
+	jobs := make(chan fetcher.Destination, config.TotalRequests)
+	results := make(chan fetcher.FetchResult, config.TotalRequests)
 
 	for w := 0; w < config.Clients; w++ {
 		go worker(jobs, results)
@@ -27,11 +29,9 @@ func main() {
 
 		ep := config.Endpoints[j%len(config.Endpoints)]
 
-		job := Destination{
-			Id:     j,
-			Url:    ep.Url,
-			Method: ep.Method,
-			Data:   ep.Data,
+		job := fetcher.Destination{
+			Id:       j,
+			Endpoint: ep,
 		}
 
 		jobs <- job

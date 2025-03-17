@@ -1,6 +1,7 @@
-package main
+package fetcher
 
 import (
+	"api-spammer/internal/config"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -11,11 +12,10 @@ import (
 )
 
 type Destination struct {
-	Id     int                    `json:"id"`
-	Url    string                 `json:"url"`
-	Method string                 `json:"method"`
-	Data   map[string]interface{} `json:"data"`
+	Id       int
+	Endpoint config.Endpoint
 }
+
 type FetchResult struct {
 	Id              int
 	StatusCode      int
@@ -26,32 +26,41 @@ type FetchResult struct {
 
 var ErrorResult = FetchResult{StatusCode: 0, Body: "", ReplyTime: 0}
 
-func CreateGetReq(ctx context.Context, d *Destination) *http.Request {
+func addHeaders(req *http.Request, headers map[string]string) {
+	for k, v := range headers {
+		req.Header.Add(k, v)
+	}
+}
+
+func createGetReq(ctx context.Context, d *Destination) *http.Request {
 	query := url.Values{}
-	for k, v := range d.Data {
+	for k, v := range d.Endpoint.Data {
 		query.Add(k, v.(string))
 	}
-	baseUrl := d.Url
+	baseUrl := d.Endpoint.Url
 	fullUrl := baseUrl + "?" + query.Encode()
 
-	req, err := http.NewRequestWithContext(ctx, d.Method, fullUrl, nil)
+	req, err := http.NewRequestWithContext(ctx, d.Endpoint.Method, fullUrl, nil)
 	if err != nil {
 		panic(err)
 	}
+
+	addHeaders(req, d.Endpoint.Headers)
 	return req
 }
-func CreatePostReq(ctx context.Context, d *Destination) *http.Request {
-	reqBytes, err := json.Marshal(d.Data)
+func createPostReq(ctx context.Context, d *Destination) *http.Request {
+	reqBytes, err := json.Marshal(d.Endpoint.Data)
 	if err != nil {
 		panic(err)
 	}
 	reqBody := bytes.NewBuffer(reqBytes)
 
-	req, err := http.NewRequestWithContext(ctx, d.Method, d.Url, reqBody)
+	req, err := http.NewRequestWithContext(ctx, d.Endpoint.Method, d.Endpoint.Url, reqBody)
 	if err != nil {
 		panic(err)
 	}
 
+	addHeaders(req, d.Endpoint.Headers)
 	req.Header.Set("Content-Type", "application/json")
 
 	return req
@@ -62,10 +71,10 @@ func (d *Destination) Fetch() FetchResult {
 	defer cancel()
 
 	var req *http.Request
-	if d.Method == "GET" {
-		req = CreateGetReq(ctx, d)
-	} else if d.Method == "POST" {
-		req = CreatePostReq(ctx, d)
+	if d.Endpoint.Method == "GET" {
+		req = createGetReq(ctx, d)
+	} else if d.Endpoint.Method == "POST" {
+		req = createPostReq(ctx, d)
 	} else {
 		panic("Method not supported")
 	}

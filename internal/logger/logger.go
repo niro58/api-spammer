@@ -1,7 +1,7 @@
 package logger
 
 import (
-	"api-spammer/rand"
+	util "api-spammer/internal/utils"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -30,7 +30,7 @@ func Log(color Color, messages ...any) {
 }
 
 func WriteLog(data interface{}) {
-	path := filepath.Join(loggerFolder, fmt.Sprintf("%s.json", rand.String(10)))
+	path := filepath.Join(loggerFolder, fmt.Sprintf("%s.json", util.RandString(10)))
 
 	file, err := os.Create(path)
 	if err != nil {

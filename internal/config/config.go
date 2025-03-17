@@ -1,15 +1,18 @@
-package main
+package config
 
 import (
-	Logger "api-spammer/logger"
+	"api-spammer/internal/logger"
+	util "api-spammer/internal/utils"
 	"encoding/json"
 	"os"
+	"path"
 )
 
 type Endpoint struct {
 	Url    string                 `json:"url"`
 	Method string                 `json:"method"`
 	Data   map[string]interface{} `json:"data"`
+	Headers map[string]string      `json:"headers"`
 }
 type Config struct {
 	Endpoints     []Endpoint `json:"endpoints"`
@@ -19,9 +22,9 @@ type Config struct {
 }
 
 func LoadConfig() Config {
-	file, err := os.Open("./config.json")
+	file, err := os.Open(path.Join(util.GetRoot(), "./config.json"))
 	if err != nil {
-		Logger.Log(Logger.ColorError, "Failed to open config file")
+		logger.Log(logger.ColorError, "Failed to open config file")
 		os.Exit(1)
 	}
 	defer file.Close()
@@ -31,7 +34,7 @@ func LoadConfig() Config {
 	err = decoder.Decode(&config)
 
 	if err != nil {
-		Logger.Log(Logger.ColorError, "Failed to parse config file", err)
+		logger.Log(logger.ColorError, "Failed to parse config file", err)
 		os.Exit(1)
 	}
 

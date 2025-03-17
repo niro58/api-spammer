@@ -1,7 +1,7 @@
-package main
+package fetcher
 
 import (
-	logger "api-spammer/logger"
+	"api-spammer/internal/logger"
 	"fmt"
 )
 
